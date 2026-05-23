@@ -1,0 +1,13 @@
+steps:
+  # Étape 1 : Synchronisation des scripts PySpark vers la zone de stockage (GCS)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gsutil'
+    args: ['rsync', '-r', 'scripts/', 'gs://velibdata-datalake-mspr/scripts/']
+
+  # Étape 2 : Déploiement des DAGs vers la machine virtuelle via le tunnel IAP
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud compute scp --tunnel-through-iap --zone=europe-west9-b dags/* geoffrey_lpde@velib-orchestrator-vm:~/velib-orchestrator/dags/
